@@ -1,4 +1,4 @@
-Fedora:
+fedora:
   Native:
     - btop
   Flatpaks:
@@ -6,4 +6,19 @@ Fedora:
     - io.github.nuttyartist.notes
   Local:
     - /home/user/Downloads/custom-app.rpm
-    - /opt/tools/my-tool.AppImage
+
+ubuntu:
+  Native:
+    - btop
+  Flatpaks:
+    - com.github.dail8859.NotepadNext
+    - io.github.nuttyartist.notes
+  Local:
+    - /home/user/Downloads/custom-app.dpkg
+  
+any:
+  Flatpaks:
+    - com.github.dail8859.NotepadNext
+    - io.github.nuttyartist.notes
+  Local:
+    - /home/user/Downloads/custom-app.rpm

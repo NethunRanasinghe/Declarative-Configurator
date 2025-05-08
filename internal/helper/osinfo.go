@@ -1,4 +1,4 @@
-package osinfo
+package helper
 
 import (
 	"os"

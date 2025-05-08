@@ -1,15 +1,23 @@
 package main
 
 import (
-	"declarative-configurator/internal/helper"
 	"fmt"
+	"log"
+	"declarative-configurator/internal/helper"
 )
 
-func main(){
-	var osDetails = osinfo.GetOsDetails()
-	fmt.Println("Arch    : ",osDetails.Arch)
-	fmt.Println("Os    : ", osDetails.Os)
-	fmt.Println("Distro    : ", osDetails.Distro)
-	fmt.Println("Distro Base    : ", osDetails.Base)
-	fmt.Println("Hostname    : ", osDetails.Hostname)
+func main() {
+	// Get OS Details
+	var osDetails = helper.GetOsDetails()
+
+	// Get Package Data from the YAML
+	packageDetails, err := helper.GetPackageDetails("Config/package.yaml", osDetails.Distro)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Package Details for", osDetails.Distro)
+	for _, details := range packageDetails {
+		fmt.Printf("%+v\n", details)
+	}
 }
