@@ -6,12 +6,6 @@ import (
 	"fmt"
 )
 
-type AppPackages struct {
-	Native   []string `yaml:"Native"`
-	Flatpaks []string `yaml:"Flatpaks"`
-	Local    []string `yaml:"Local"`
-}
-
 func GetPackageDetails(configPath string, baseOs string) ([]AppPackages, error){
 	var allPackageDetails []AppPackages
 
