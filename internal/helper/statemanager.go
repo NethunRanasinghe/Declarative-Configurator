@@ -71,43 +71,38 @@ func CheckState(appPackages AppPackages)(StateChanges, bool){
 	return stateChanges, true
 }
 
-func GetPackageDifferences(configPackages AppPackages, statePackages AppPackages, changes *StateChanges){
+// Differences - Package ------ Start
 
-	// Added (To-Install)
-	for _, value := range configPackages.Native{
-		if !(Contains(statePackages.Native, value)){
-			changes.NativeToInstall = append(changes.NativeToInstall, value)
-		}
-	}
+func GetPackageDifferences(config AppPackages, state AppPackages, changes *StateChanges) {
+	changes.NativeToInstall = diffAdd(config.Native, state.Native)
+	changes.FlatpakToInstall = diffAdd(config.Flatpaks, state.Flatpaks)
+	changes.LocalToInstall = diffAdd(config.Local, state.Local)
 
-	for _, value := range configPackages.Flatpaks{
-		if !(Contains(statePackages.Flatpaks, value)){
-			changes.FlatpakToInstall = append(changes.FlatpakToInstall, value)
-		}
-	}
-
-	for _, value := range configPackages.Local{
-		if !(Contains(statePackages.Local, value)){
-			changes.LocalToInstall = append(changes.LocalToInstall, value)
-		}
-	}
-
-	// Removed (To-Remove)
-	for _, value := range statePackages.Native{
-		if !(Contains(configPackages.Native, value)){
-			changes.NativeToRemove = append(changes.NativeToRemove, value)
-		}
-	}
-
-	for _, value := range statePackages.Flatpaks{
-		if !(Contains(configPackages.Flatpaks, value)){
-			changes.FlatpakToRemove = append(changes.FlatpakToRemove, value)
-		}
-	}
-
-	for _, value := range statePackages.Local{
-		if !(Contains(configPackages.Local, value)){
-			changes.LocalToRemove = append(changes.LocalToRemove, value)
-		}
-	}
+	changes.NativeToRemove = diffRemove(config.Native, state.Native)
+	changes.FlatpakToRemove = diffRemove(config.Flatpaks, state.Flatpaks)
+	changes.LocalToRemove = diffRemove(config.Local, state.Local)
 }
+
+// Added (To-Install)
+func diffAdd(list1, list2 []string) []string {
+	var result []string
+	for _, val := range list1 {
+		if !Contains(list2, val) {
+			result = append(result, val)
+		}
+	}
+	return result
+}
+
+// Removed (To-Remove)
+func diffRemove(list1, list2 []string) []string {
+	var result []string
+	for _, val := range list2 {
+		if !Contains(list1, val) {
+			result = append(result, val)
+		}
+	}
+	return result
+}
+
+// Differences - Package ------ End
