@@ -1,6 +1,7 @@
 fedora:
   Native:
     - btop
+    - htop
   Flatpaks:
     - com.github.dail8859.NotepadNext
     - io.github.nuttyartist.notes

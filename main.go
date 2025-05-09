@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"declarative-configurator/internal/helper"
+	"declarative-configurator/internal/modules/packages"
 )
 
 func main() {
@@ -16,8 +16,16 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Package Details for", osDetails.Distro)
+	// Install Package
 	for _, details := range packageDetails {
-		fmt.Printf("%+v\n", details)
+		for _, pkgDetails := range details.Native{
+			
+			var pm packages.PackageManager = packages.DnfManager{}
+			packageOps(pm, pkgDetails)
+		}
 	}
+}
+
+func packageOps(pm packages.PackageManager, pkg string){
+	pm.Install(pkg)
 }
