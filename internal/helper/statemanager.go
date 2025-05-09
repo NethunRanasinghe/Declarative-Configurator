@@ -16,22 +16,18 @@ type StateChanges struct{
 	LocalToRemove []string
 }
 
-const stateFile string = ".state.yaml"
+const StateFile string = ".state.yaml"
 
 func CheckState(appPackages AppPackages)(StateChanges, bool){
 	var stateChanges StateChanges
 	var statePackages AppPackages
 
 	// Check if state file exists
-	_, err := os.Stat(stateFile)
+	_, err := os.Stat(StateFile)
 
 	// If it doesn't exist
 	if err != nil{
-		// Create StateFile
-		_, err := os.Create(stateFile)
-		if err != nil{
-			log.Panic(err)
-		}
+		CreateStateYaml()
 
 		// Assign config packages to to-install
 		stateChanges.NativeToInstall = appPackages.Native
@@ -42,7 +38,7 @@ func CheckState(appPackages AppPackages)(StateChanges, bool){
 	}
 
 	// If it exist
-	stateDetails, err := os.ReadFile(stateFile)
+	stateDetails, err := os.ReadFile(StateFile)
 	if err != nil{
 		panic(err)
 	}
@@ -56,7 +52,7 @@ func CheckState(appPackages AppPackages)(StateChanges, bool){
 	}
 
 	// Get Packages Data
-	statePackages, ok1 := statePackagesMap["Packages"]
+	statePackages, ok1 := statePackagesMap["packages"]
 	if !ok1 {
 		log.Fatal("Error Reading State File !")
 	}

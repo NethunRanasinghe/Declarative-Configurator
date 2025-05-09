@@ -7,6 +7,11 @@ import (
 )
 
 func main() {
+	// Start Program
+	startProgram()
+}
+
+func startProgram(){
 	// Get OS Details
 	var osDetails = helper.GetOsDetails()
 
