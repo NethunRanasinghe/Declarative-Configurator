@@ -2,87 +2,52 @@ package packages
 
 import (
 	"fmt"
-	"os/exec"
 	"os"
+	"os/exec"
 )
 
-type DnfManager struct {}
-const breakLine string = "--------------------------------------------------"
+type DnfManager struct{}
 
-func (d DnfManager) Install(pkg string) error{
+const breakLine = "--------------------------------------------------"
 
-	// Command
-	cmd := exec.Command("sudo", "dnf", "install", pkg, "-y")
+func (d DnfManager) runDnfCommand(action string, args ...string) error {
+	// Construct the full command
+	cmdArgs := append([]string{"dnf", action}, args...)
+	cmdArgs = append(cmdArgs, "-y")
+	cmd := exec.Command("sudo", cmdArgs...)
 
-	// Connect command output to current stdout/stderr
-    cmd.Stdout = os.Stdout
-    cmd.Stderr = os.Stderr
+	// Connect output
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 
 	fmt.Println(breakLine)
-	fmt.Println("Installing ", pkg)
+	if len(args) > 0 {
+		fmt.Printf("%s %s\n", action, args[0])
+	} else {
+		fmt.Printf("%s Packages\n", action)
+	}
 	fmt.Println(breakLine)
 
-	// Run and check for errors
-    if err := cmd.Run(); err != nil {
-		exitError, ok := err.(*exec.ExitError)
-		if ok{
-			return fmt.Errorf("dnf install failed with exit code %d", exitError.ExitCode())
+	// Execute command
+	if err := cmd.Run(); err != nil {
+		if exitError, ok := err.(*exec.ExitError); ok {
+			return fmt.Errorf("dnf %s failed with exit code %d", action, exitError.ExitCode())
 		}
-        return fmt.Errorf("failed to execute dnf install: %w", err)
-    }
+		return fmt.Errorf("failed to execute dnf %s: %w", action, err)
+	}
 
-    fmt.Println("Package(s) installed successfully.")
+	fmt.Printf("dnf %s completed successfully.\n", action)
 	return nil
 }
 
-func (d DnfManager) Remove(pkg string) error{
-
-	// Command
-	cmd := exec.Command("sudo", "dnf", "remove", pkg, "-y")
-
-	// Connect command output to current stdout/stderr
-    cmd.Stdout = os.Stdout
-    cmd.Stderr = os.Stderr
-
-	fmt.Println(breakLine)
-	fmt.Println("Removing ", pkg)
-	fmt.Println(breakLine)
-
-	// Run and check for errors
-    if err := cmd.Run(); err != nil {
-		exitError, ok := err.(*exec.ExitError)
-		if ok{
-			return fmt.Errorf("dnf uninstall failed with exit code %d", exitError.ExitCode())
-		}
-        return fmt.Errorf("failed to execute dnf remove: %w", err)
-    }
-
-    fmt.Println("Package(s) removed successfully.")
-	return nil
+func (d DnfManager) Install(pkg string) error {
+	return d.runDnfCommand("install", pkg)
 }
 
-func (d DnfManager) Update() error{
+func (d DnfManager) Remove(pkg string) error {
+	return d.runDnfCommand("remove", pkg)
+}
 
-	// Command
-	cmd := exec.Command("sudo", "dnf", "update", "-y")
-
-	// Connect command output to current stdout/stderr
-    cmd.Stdout = os.Stdout
-    cmd.Stderr = os.Stderr
-
-	fmt.Println(breakLine)
-	fmt.Println("Updating Packages")
-	fmt.Println(breakLine)
-
-	// Run and check for errors
-    if err := cmd.Run(); err != nil {
-		exitError, ok := err.(*exec.ExitError)
-		if ok{
-			return fmt.Errorf("dnf update failed with exit code %d", exitError.ExitCode())
-		}
-        return fmt.Errorf("failed to execute dnf update: %w", err)
-    }
-
-    fmt.Println("System updated successfully.")
-	return nil
+func (d DnfManager) Update() error {
+	return d.runDnfCommand("update")
 }
