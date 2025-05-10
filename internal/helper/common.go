@@ -26,9 +26,14 @@ type StateConfig struct {
 }
 
 var DistroAndPackageManager = map[string]string{
-	"fedora": "dnf",
-	"ubuntu": "apt",
-	"debian": "apt"}
+	"fedora":    "dnf",
+	"rhel":      "dnf",
+	"centos":    "dnf",
+	"rocky":     "dnf",
+	"almalinux": "dnf",
+	"ubuntu":    "apt",
+	"debian":    "apt",
+}
 
 type StateTemplate struct {
 	Packages AppPackages `yaml:"packages"`

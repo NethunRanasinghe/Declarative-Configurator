@@ -1,18 +1,11 @@
 fedora:
   Native:
     - btop
-  Flatpaks:
-  Local:
-
-ubuntu:
-  Native:
-    - btop
-    - nano
+    - htop
   Flatpaks:
   Local:
   
 any:
   Native:
-    - htop
   Flatpaks:
   Local:
