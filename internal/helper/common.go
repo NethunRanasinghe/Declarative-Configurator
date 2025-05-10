@@ -13,6 +13,16 @@ type AppPackages struct {
 	Local    []string `yaml:"Local"`
 }
 
+type PackageOperation struct {
+	Install []string
+	Remove  []string
+}
+
+var DistroAndPackageManager = map[string]string{
+	"fedora": "dnf",
+	"ubuntu": "apt",
+	"debian": "apt"}
+
 type StateTemplate struct {
 	Packages AppPackages `yaml:"packages"`
 }

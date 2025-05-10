@@ -9,6 +9,8 @@ import (
 
 func main() {
 	// Start Program
+
+	// Start Package Module
 	startPackageModule()
 }
 
@@ -31,11 +33,17 @@ func startPackageModule() {
 	// Check State
 	changes, hasChanged := helper.CheckState(allPackages)
 	if !hasChanged {
-		fmt.Println("Packages : No Changed !")
+		fmt.Println("Packages : No Changes !")
 		return
 	}
 
-	fmt.Println(changes)
+	// Separate Changes
+	seperatedChanges := separateChanges(changes, &osDetails.Distro)
+
+	// Perform Package Operations
+	for pm, ch := range seperatedChanges {
+		packageOps(pm, ch)
+	}
 }
 
 func updateAllPackages(packageDetails []helper.AppPackages, allPackages *helper.AppPackages) {
@@ -65,10 +73,50 @@ func mergePackages(pkg1, pkg2 []string) []string {
 	return result
 }
 
-func packageOps(pm packages.PackageManager, pkg string) {
-	err := pm.Install(pkg)
-	if err != nil {
-		return
+func separateChanges(changes helper.StateChanges, distro *string) map[packages.PackageManager]helper.PackageOperation {
+	var allChanges = map[packages.PackageManager]helper.PackageOperation{}
+
+	// Separate Native Changes
+	var nativeChanges helper.PackageOperation
+	nativeChanges.Install = changes.NativeToInstall
+	nativeChanges.Remove = changes.NativeToRemove
+	allChanges[separatedChangesNative(distro)] = nativeChanges
+
+	// Return all changes
+	return allChanges
+}
+
+func separatedChangesNative(distro *string) packages.PackageManager {
+	var pmTypeMap = map[string]int{"dnf": 0, "apt": 1}
+	var pm packages.PackageManager
+
+	pmType := pmTypeMap[helper.DistroAndPackageManager[*distro]]
+
+	// Perform Package Operations
+	if pmType == 0 {
+		pm = packages.DnfManager{}
+	} else {
+		log.Fatal("Package Manager is not supported")
+	}
+
+	return pm
+}
+
+func packageOps(pm packages.PackageManager, changes helper.PackageOperation) {
+	// Install Package
+	for _, pkg := range changes.Install {
+		err := pm.Install(pkg)
+		if err != nil {
+			return
+		}
+	}
+
+	// Remove Package
+	for _, pkg := range changes.Remove {
+		err := pm.Remove(pkg)
+		if err != nil {
+			return
+		}
 	}
 }
 

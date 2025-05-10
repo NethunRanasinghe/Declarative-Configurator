@@ -1,8 +1,4 @@
 packages:
   Native:
-    - btop
-    - curl
-    - wget
-    - nano
   Flatpaks: []
   Local: []

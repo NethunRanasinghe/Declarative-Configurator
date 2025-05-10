@@ -1,6 +1,7 @@
 package packages
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -30,7 +31,8 @@ func (d DnfManager) runDnfCommand(action string, args ...string) error {
 
 	// Execute command
 	if err := cmd.Run(); err != nil {
-		if exitError, ok := err.(*exec.ExitError); ok {
+		var exitError *exec.ExitError
+		if errors.As(err, &exitError) {
 			return fmt.Errorf("dnf %s failed with exit code %d", action, exitError.ExitCode())
 		}
 		return fmt.Errorf("failed to execute dnf %s: %w", action, err)

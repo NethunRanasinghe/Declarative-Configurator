@@ -1,28 +1,20 @@
 fedora:
   Native:
     - btop
+    - htop
   Flatpaks:
-    - com.github.dail8859.NotepadNext
-    - io.github.nuttyartist.notes
   Local:
-    - /home/user/Downloads/custom-app.rpm
 
 ubuntu:
   Native:
     - btop
+    - nano
   Flatpaks:
-    - com.github.dail8859.NotepadNext
-    - io.github.nuttyartist.notes
   Local:
-    - /home/user/Downloads/custom-app.dpkg
   
 any:
   Native:
     - curl
     - wget
-    - htop
   Flatpaks:
-    - com.github.dail8859.NotepadNext
-    - io.github.nuttyartist.notes
   Local:
-    - /home/user/Downloads/custom-app.rpm
