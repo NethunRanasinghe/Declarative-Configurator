@@ -1,7 +1,6 @@
 packages:
   Native:
     - btop
-    - htop
     - curl
     - wget
     - nano

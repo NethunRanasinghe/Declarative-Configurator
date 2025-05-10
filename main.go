@@ -12,6 +12,8 @@ func main() {
 	startPackageModule()
 }
 
+//region Package Module
+
 func startPackageModule() {
 	// Get OS Details
 	var osDetails = helper.GetOsDetails()
@@ -24,34 +26,43 @@ func startPackageModule() {
 
 	// Merge
 	var allPackages helper.AppPackages
-
-	for _, details := range packageDetails {
-		for _, pkg := range details.Native {
-			if !(helper.Contains(allPackages.Native, pkg)) {
-				allPackages.Native = append(allPackages.Native, pkg)
-			}
-		}
-
-		for _, pkg := range details.Flatpaks {
-			if !(helper.Contains(allPackages.Flatpaks, pkg)) {
-				allPackages.Flatpaks = append(allPackages.Flatpaks, pkg)
-			}
-		}
-
-		for _, pkg := range details.Local {
-			if !(helper.Contains(allPackages.Local, pkg)) {
-				allPackages.Local = append(allPackages.Local, pkg)
-			}
-		}
-	}
+	updateAllPackages(packageDetails, &allPackages)
 
 	// Check State
 	changes, hasChanged := helper.CheckState(allPackages)
 	if !hasChanged {
+		fmt.Println("Packages : No Changed !")
 		return
 	}
 
 	fmt.Println(changes)
+}
+
+func updateAllPackages(packageDetails []helper.AppPackages, allPackages *helper.AppPackages) {
+	var nativeAll []string
+	var flatpakAll []string
+	var localAll []string
+
+	for _, details := range packageDetails {
+		nativeAll = append(nativeAll, mergePackages(details.Native, allPackages.Native)...)
+		flatpakAll = append(flatpakAll, mergePackages(details.Flatpaks, allPackages.Flatpaks)...)
+		localAll = append(localAll, mergePackages(details.Local, allPackages.Local)...)
+	}
+
+	allPackages.Native = nativeAll
+	allPackages.Flatpaks = flatpakAll
+	allPackages.Local = localAll
+}
+
+func mergePackages(pkg1, pkg2 []string) []string {
+	var result []string
+	for _, value := range pkg1 {
+		if !(helper.Contains(pkg2, value)) {
+			result = append(result, value)
+		}
+	}
+
+	return result
 }
 
 func packageOps(pm packages.PackageManager, pkg string) {
@@ -60,3 +71,5 @@ func packageOps(pm packages.PackageManager, pkg string) {
 		return
 	}
 }
+
+//endregion
