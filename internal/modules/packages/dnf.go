@@ -1,6 +1,7 @@
 package packages
 
 import (
+	"declarative-configurator/internal/helper"
 	"errors"
 	"fmt"
 	"os"
@@ -43,13 +44,43 @@ func (d DnfManager) runDnfCommand(action string, args ...string) error {
 }
 
 func (d DnfManager) Install(pkg string) error {
-	return d.runDnfCommand("install", pkg)
+	err := d.runDnfCommand("install", pkg)
+	if err != nil {
+		return err
+	}
+
+	installStateConfig := createStateConfigHelper(pkg, 1)
+	err = helper.StateManager(installStateConfig)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (d DnfManager) Remove(pkg string) error {
-	return d.runDnfCommand("remove", pkg)
+	err := d.runDnfCommand("remove", pkg)
+	if err != nil {
+		return err
+	}
+
+	removeStateConfig := createStateConfigHelper(pkg, 0)
+	err = helper.StateManager(removeStateConfig)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (d DnfManager) Update() error {
 	return d.runDnfCommand("update")
+}
+
+func createStateConfigHelper(pkg string, addOrRemove int) helper.StateConfig {
+	var stateConfig helper.StateConfig
+	stateConfig.ModuleType = 0
+	stateConfig.PackageType = 0
+	stateConfig.AddOrRemove = addOrRemove
+	stateConfig.PackageName = pkg
+
+	return stateConfig
 }

@@ -18,6 +18,13 @@ type PackageOperation struct {
 	Remove  []string
 }
 
+type StateConfig struct {
+	ModuleType  int
+	PackageType int
+	AddOrRemove int
+	PackageName string
+}
+
 var DistroAndPackageManager = map[string]string{
 	"fedora": "dnf",
 	"ubuntu": "apt",
@@ -47,8 +54,30 @@ func CreateStateYaml() {
 	}
 
 	// Write to file
-	err = os.WriteFile(StateFile, data, 0644)
+	err2 := os.WriteFile(StateFile, data, 0644)
+	if err2 != nil {
+		log.Panic(err2)
+	}
+}
+
+func ReadFileData(filePath string) []byte {
+	fileData, err := os.ReadFile(filePath)
 	if err != nil {
 		log.Panic(err)
 	}
+	return fileData
+}
+
+func RefreshState() {
+	StateDetails = ReadFileData(StateFile)
+}
+
+func RemoveFromSlice(s []string, item string) []string {
+	for index, value := range s {
+		if value == item {
+			return append(s[:index], s[index+1:]...)
+		}
+	}
+
+	return s
 }

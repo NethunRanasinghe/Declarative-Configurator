@@ -1,4 +1,6 @@
 packages:
-  Native:
   Flatpaks: []
   Local: []
+  Native:
+  - btop
+  - htop

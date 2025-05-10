@@ -1,7 +1,6 @@
 fedora:
   Native:
     - btop
-    - htop
   Flatpaks:
   Local:
 
@@ -14,7 +13,6 @@ ubuntu:
   
 any:
   Native:
-    - curl
-    - wget
+    - htop
   Flatpaks:
   Local:

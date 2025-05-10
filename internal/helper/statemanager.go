@@ -18,7 +18,9 @@ type StateChanges struct {
 
 const StateFile string = ".state.yaml"
 
-func CheckState(appPackages AppPackages) (StateChanges, bool) {
+var StateDetails []byte
+
+func CheckPackageState(appPackages AppPackages) (StateChanges, bool) {
 	var stateChanges StateChanges
 	var statePackages AppPackages
 
@@ -38,16 +40,13 @@ func CheckState(appPackages AppPackages) (StateChanges, bool) {
 	}
 
 	// If it exists
-	stateDetails, err := os.ReadFile(StateFile)
-	if err != nil {
-		panic(err)
-	}
+	RefreshState()
 
 	// Create a map
 	statePackagesMap := make(map[string]AppPackages)
 
 	// Unmarshal the YAML into the map
-	if err := yaml.Unmarshal(stateDetails, &statePackagesMap); err != nil {
+	if err := yaml.Unmarshal(StateDetails, &statePackagesMap); err != nil {
 		panic(err)
 	}
 
@@ -63,13 +62,93 @@ func CheckState(appPackages AppPackages) (StateChanges, bool) {
 		return stateChanges, false
 	}
 
-	GetPackageDifferences(appPackages, statePackages, &stateChanges)
+	getPackageDifferences(appPackages, statePackages, &stateChanges)
 	return stateChanges, true
 }
 
-// Differences - Package ------ Start
+func StateManager(stateConfig StateConfig) error {
+	var stateMap map[string]interface{}
 
-func GetPackageDifferences(config AppPackages, state AppPackages, changes *StateChanges) {
+	// Refresh State
+	RefreshState()
+
+	// Unmarshal YAML
+	if err := yaml.Unmarshal(StateDetails, &stateMap); err != nil {
+		return err
+	}
+
+	// Update Package Section
+	if stateConfig.ModuleType == 0 {
+		// Extract Section
+		yamlPackagesSection := stateMap["packages"]
+		yamlPackageSectionBytes, _ := yaml.Marshal(yamlPackagesSection)
+
+		var yamlPackages AppPackages
+		err := yaml.Unmarshal(yamlPackageSectionBytes, &yamlPackages)
+		if err != nil {
+			return err
+		}
+
+		// Modify
+		stateManagerPackageModify(&yamlPackages, &stateConfig)
+
+		// Recreate
+		newYamlPackageSectionBytes, _ := yaml.Marshal(yamlPackages)
+		var newUpdatedPackageMap map[string]interface{}
+		err1 := yaml.Unmarshal(newYamlPackageSectionBytes, &newUpdatedPackageMap)
+		if err1 != nil {
+			return err1
+		}
+		stateMap["packages"] = newUpdatedPackageMap
+	}
+
+	// Write To File
+	newUpdatedYaml, _ := yaml.Marshal(stateMap)
+
+	// Write to file
+	err2 := os.WriteFile(StateFile, newUpdatedYaml, 0644)
+	if err2 != nil {
+		return err2
+	}
+
+	return nil
+}
+
+//region Package Module
+
+func stateManagerPackageModify(stateFilePackagesSection *AppPackages, stateConfig *StateConfig) {
+	// Native - 0, Flatpak - 1, Local - 2
+	// Add - 1, Remove - 0
+
+	// Native
+	if stateConfig.PackageType == 0 {
+		if stateConfig.AddOrRemove == 1 {
+			stateFilePackagesSection.Native = append(stateFilePackagesSection.Native, stateConfig.PackageName)
+		} else {
+			stateFilePackagesSection.Native = RemoveFromSlice(stateFilePackagesSection.Native, stateConfig.PackageName)
+		}
+	}
+
+	// Flatpak
+	if stateConfig.PackageType == 1 {
+		if stateConfig.AddOrRemove == 1 {
+			stateFilePackagesSection.Flatpaks = append(stateFilePackagesSection.Flatpaks, stateConfig.PackageName)
+		} else {
+			stateFilePackagesSection.Flatpaks = RemoveFromSlice(stateFilePackagesSection.Flatpaks, stateConfig.PackageName)
+		}
+	}
+
+	// Local
+	if stateConfig.PackageType == 2 {
+		if stateConfig.AddOrRemove == 1 {
+			stateFilePackagesSection.Local = append(stateFilePackagesSection.Local, stateConfig.PackageName)
+		} else {
+			stateFilePackagesSection.Local = RemoveFromSlice(stateFilePackagesSection.Local, stateConfig.PackageName)
+		}
+	}
+}
+
+func getPackageDifferences(config AppPackages, state AppPackages, changes *StateChanges) {
 	changes.NativeToInstall = diffAdd(config.Native, state.Native)
 	changes.FlatpakToInstall = diffAdd(config.Flatpaks, state.Flatpaks)
 	changes.LocalToInstall = diffAdd(config.Local, state.Local)
@@ -101,4 +180,4 @@ func diffRemove(list1, list2 []string) []string {
 	return result
 }
 
-// Differences - Package ------ End
+//endregion

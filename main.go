@@ -31,7 +31,7 @@ func startPackageModule() {
 	updateAllPackages(packageDetails, &allPackages)
 
 	// Check State
-	changes, hasChanged := helper.CheckState(allPackages)
+	changes, hasChanged := helper.CheckPackageState(allPackages)
 	if !hasChanged {
 		fmt.Println("Packages : No Changes !")
 		return
