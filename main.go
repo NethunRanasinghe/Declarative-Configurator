@@ -12,13 +12,8 @@ import (
 func main() {
 	const stringFormat string = "%-8s : %2s\n"
 
-	// CMD Arguments
-	if len(os.Args) < 2 {
-		fmt.Printf(stringFormat, "\nWarning", "No argument provided, refreshing all configs !")
-	}
-
-	//mainCommand := os.Args[1]
-	//subCommand := os.Args[2]
+	// Handle CMD Arguments
+	helper.HandleCMDArgs(os.Args, stringFormat)
 
 	// CMD Flags
 	configPtr := flag.String("config", "", "Config File Location")
@@ -32,22 +27,40 @@ func main() {
 	var osDetails = helper.GetOsDetails()
 
 	// Start Program
+	showWelcome(stringFormat, osDetails)
+	result := helper.HandleCMDArgs(os.Args, stringFormat)
+
+	if result == -1 {
+		os.Exit(1)
+	}
+
+	if result == 0 || result == 1 {
+		fmt.Printf(stringFormat, "\nInfo", "Refreshing all!")
+		startPackageModule(configPath, osDetails)
+	}
+
+	if result == 2 {
+		fmt.Printf(stringFormat, "\nInfo", "Refreshing packages!")
+		startPackageModule(configPath, osDetails)
+	}
+
+}
+
+func showWelcome(stringFormat string, osDetails helper.OsDetailsObject) {
 	fmt.Println("----------------------------------Welcome----------------------------------")
 	fmt.Printf(stringFormat, "OS", osDetails.Os)
 	fmt.Printf(stringFormat, "Distro", osDetails.Distro)
 	fmt.Printf(stringFormat, "Base", osDetails.Base)
 	fmt.Printf(stringFormat, "Arch", osDetails.Arch)
 	fmt.Printf(stringFormat, "Hostname", osDetails.Hostname)
-
-	// Start Package Module
-	fmt.Println("\nPackage Module : Start")
-	startPackageModule(configPath, osDetails)
-	fmt.Println("\nPackage Module : End")
 }
 
 //region Package Module
 
 func startPackageModule(configDirLoc string, osDetails helper.OsDetailsObject) {
+
+	fmt.Println("\nPackage Module : Start")
+
 	// Set Config Path
 	packageConfigPath := fmt.Sprintf("%s/%s", configDirLoc, "package.yaml")
 
@@ -75,6 +88,8 @@ func startPackageModule(configDirLoc string, osDetails helper.OsDetailsObject) {
 	for pm, ch := range seperatedChanges {
 		packageOps(pm, ch)
 	}
+
+	fmt.Println("\nPackage Module : End")
 }
 
 func updateAllPackages(packageDetails []helper.AppPackages, allPackages *helper.AppPackages) {
