@@ -35,11 +35,9 @@ func CheckPackageState(appPackages AppPackages) (StateChanges, bool) {
 		stateChanges.NativeToInstall = appPackages.Native
 		stateChanges.FlatpakToInstall = appPackages.Flatpaks
 		stateChanges.LocalToInstall = appPackages.Local
-
-		return stateChanges, true
 	}
 
-	// If it exists
+	// Refresh State
 	RefreshState()
 
 	// Create a map
@@ -55,6 +53,10 @@ func CheckPackageState(appPackages AppPackages) (StateChanges, bool) {
 	if !ok1 {
 		log.Fatal("Error Reading State File !")
 	}
+
+	// Normalize both structs
+	normalizePackageStructs(&statePackages)
+	normalizePackageStructs(&appPackages)
 
 	// Compare State and Config
 	isEqual := reflect.DeepEqual(statePackages, appPackages)
@@ -178,6 +180,20 @@ func diffRemove(list1, list2 []string) []string {
 		}
 	}
 	return result
+}
+
+func normalizePackageStructs(s *AppPackages) {
+	if s.Native == nil {
+		s.Native = []string{}
+	}
+
+	if s.Flatpaks == nil {
+		s.Flatpaks = []string{}
+	}
+
+	if s.Local == nil {
+		s.Local = []string{}
+	}
 }
 
 //endregion

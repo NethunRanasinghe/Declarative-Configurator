@@ -3,25 +3,46 @@ package main
 import (
 	"declarative-configurator/internal/helper"
 	"declarative-configurator/internal/modules/packages"
+	"flag"
 	"fmt"
 	"log"
 )
 
 func main() {
+	const stringFormat string = "%-8s : %2s\n"
+	// CMD Flags
+	configPtr := flag.String("config", "", "Config File Location")
+	configSPtr := flag.String("c", "", "Config File Location")
+
+	// Get Config
+	flag.Parse()
+	configPath := helper.GetConfigPath(configPtr, configSPtr)
+
+	// Get OS Details
+	var osDetails = helper.GetOsDetails()
+
 	// Start Program
+	fmt.Println("----------------------------------Welcome----------------------------------")
+	fmt.Printf(stringFormat, "OS", osDetails.Os)
+	fmt.Printf(stringFormat, "Distro", osDetails.Distro)
+	fmt.Printf(stringFormat, "Base", osDetails.Base)
+	fmt.Printf(stringFormat, "Arch", osDetails.Arch)
+	fmt.Printf(stringFormat, "Hostname", osDetails.Hostname)
 
 	// Start Package Module
-	startPackageModule()
+	fmt.Println("\nPackage Module : Start")
+	startPackageModule(configPath, osDetails)
+	fmt.Println("\nPackage Module : End")
 }
 
 //region Package Module
 
-func startPackageModule() {
-	// Get OS Details
-	var osDetails = helper.GetOsDetails()
+func startPackageModule(configDirLoc string, osDetails helper.OsDetailsObject) {
+	// Set Config Path
+	packageConfigPath := fmt.Sprintf("%s/%s", configDirLoc, "package.yaml")
 
 	// Get Package Data from the YAML
-	packageDetails, err := helper.GetPackageDetails("Config/package.yaml", osDetails.Distro)
+	packageDetails, err := helper.GetPackageDetails(packageConfigPath, osDetails.Distro)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,7 +54,7 @@ func startPackageModule() {
 	// Check State
 	changes, hasChanged := helper.CheckPackageState(allPackages)
 	if !hasChanged {
-		fmt.Println("Packages : No Changes !")
+		fmt.Println("\nPackages : No Changes !")
 		return
 	}
 
