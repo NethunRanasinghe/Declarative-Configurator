@@ -6,10 +6,20 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 )
 
 func main() {
 	const stringFormat string = "%-8s : %2s\n"
+
+	// CMD Arguments
+	if len(os.Args) < 2 {
+		fmt.Printf(stringFormat, "\nWarning", "No argument provided, refreshing all configs !")
+	}
+
+	//mainCommand := os.Args[1]
+	//subCommand := os.Args[2]
+
 	// CMD Flags
 	configPtr := flag.String("config", "", "Config File Location")
 	configSPtr := flag.String("c", "", "Config File Location")
