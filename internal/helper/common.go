@@ -2,9 +2,9 @@ package helper
 
 import (
 	"github.com/goccy/go-yaml"
-	"slices"
-	"os"
 	"log"
+	"os"
+	"slices"
 )
 
 type AppPackages struct {

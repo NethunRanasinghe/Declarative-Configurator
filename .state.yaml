@@ -1,4 +1,9 @@
 packages:
-  Native: []
+  Native:
+    - btop
+    - htop
+    - curl
+    - wget
+    - nano
   Flatpaks: []
   Local: []

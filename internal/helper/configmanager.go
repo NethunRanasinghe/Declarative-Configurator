@@ -1,16 +1,16 @@
 package helper
 
 import (
+	"fmt"
 	"github.com/goccy/go-yaml"
 	"os"
-	"fmt"
 )
 
-func GetPackageDetails(configPath string, baseOs string) ([]AppPackages, error){
+func GetPackageDetails(configPath string, baseOs string) ([]AppPackages, error) {
 	var allPackageDetails []AppPackages
 
 	packageDetails, err := os.ReadFile(configPath)
-	if err != nil{
+	if err != nil {
 		panic(err)
 	}
 
@@ -26,11 +26,11 @@ func GetPackageDetails(configPath string, baseOs string) ([]AppPackages, error){
 	osPackageDetails, ok1 := osPackages[baseOs]
 	anyPackageDetails, ok2 := osPackages["any"]
 
-	if ok1{
+	if ok1 {
 		allPackageDetails = append(allPackageDetails, osPackageDetails)
 	}
 
-	if ok2{
+	if ok2 {
 		allPackageDetails = append(allPackageDetails, anyPackageDetails)
 	}
 

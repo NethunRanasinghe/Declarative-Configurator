@@ -1,17 +1,18 @@
 package main
 
 import (
-	"log"
 	"declarative-configurator/internal/helper"
 	"declarative-configurator/internal/modules/packages"
+	"fmt"
+	"log"
 )
 
 func main() {
 	// Start Program
-	startProgram()
+	startPackageModule()
 }
 
-func startProgram(){
+func startPackageModule() {
 	// Get OS Details
 	var osDetails = helper.GetOsDetails()
 
@@ -21,16 +22,41 @@ func startProgram(){
 		log.Fatal(err)
 	}
 
-	// Install Package
+	// Merge
+	var allPackages helper.AppPackages
+
 	for _, details := range packageDetails {
-		for _, pkgDetails := range details.Native{
-			
-			var pm packages.PackageManager = packages.DnfManager{}
-			packageOps(pm, pkgDetails)
+		for _, pkg := range details.Native {
+			if !(helper.Contains(allPackages.Native, pkg)) {
+				allPackages.Native = append(allPackages.Native, pkg)
+			}
+		}
+
+		for _, pkg := range details.Flatpaks {
+			if !(helper.Contains(allPackages.Flatpaks, pkg)) {
+				allPackages.Flatpaks = append(allPackages.Flatpaks, pkg)
+			}
+		}
+
+		for _, pkg := range details.Local {
+			if !(helper.Contains(allPackages.Local, pkg)) {
+				allPackages.Local = append(allPackages.Local, pkg)
+			}
 		}
 	}
+
+	// Check State
+	changes, hasChanged := helper.CheckState(allPackages)
+	if !hasChanged {
+		return
+	}
+
+	fmt.Println(changes)
 }
 
-func packageOps(pm packages.PackageManager, pkg string){
-	pm.Install(pkg)
+func packageOps(pm packages.PackageManager, pkg string) {
+	err := pm.Install(pkg)
+	if err != nil {
+		return
+	}
 }

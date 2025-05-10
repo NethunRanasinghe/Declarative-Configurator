@@ -18,6 +18,9 @@ ubuntu:
     - /home/user/Downloads/custom-app.dpkg
   
 any:
+  Native:
+    - curl
+    - wget
   Flatpaks:
     - com.github.dail8859.NotepadNext
     - io.github.nuttyartist.notes

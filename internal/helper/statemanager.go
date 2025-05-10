@@ -2,23 +2,23 @@ package helper
 
 import (
 	"github.com/goccy/go-yaml"
-	"os"
 	"log"
+	"os"
 	"reflect"
 )
 
-type StateChanges struct{
-	NativeToInstall []string
+type StateChanges struct {
+	NativeToInstall  []string
 	FlatpakToInstall []string
-	LocalToInstall []string
-	NativeToRemove []string
-	FlatpakToRemove []string
-	LocalToRemove []string
+	LocalToInstall   []string
+	NativeToRemove   []string
+	FlatpakToRemove  []string
+	LocalToRemove    []string
 }
 
 const StateFile string = ".state.yaml"
 
-func CheckState(appPackages AppPackages)(StateChanges, bool){
+func CheckState(appPackages AppPackages) (StateChanges, bool) {
 	var stateChanges StateChanges
 	var statePackages AppPackages
 
@@ -26,7 +26,7 @@ func CheckState(appPackages AppPackages)(StateChanges, bool){
 	_, err := os.Stat(StateFile)
 
 	// If it doesn't exist
-	if err != nil{
+	if err != nil {
 		CreateStateYaml()
 
 		// Assign config packages to to-install
@@ -37,9 +37,9 @@ func CheckState(appPackages AppPackages)(StateChanges, bool){
 		return stateChanges, true
 	}
 
-	// If it exist
+	// If it exists
 	stateDetails, err := os.ReadFile(StateFile)
-	if err != nil{
+	if err != nil {
 		panic(err)
 	}
 
@@ -59,11 +59,11 @@ func CheckState(appPackages AppPackages)(StateChanges, bool){
 
 	// Compare State and Config
 	isEqual := reflect.DeepEqual(statePackages, appPackages)
-	if isEqual{
+	if isEqual {
 		return stateChanges, false
 	}
 
-	GetPackageDifferences(statePackages, appPackages, &stateChanges)
+	GetPackageDifferences(appPackages, statePackages, &stateChanges)
 	return stateChanges, true
 }
 
