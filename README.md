@@ -2,8 +2,8 @@
 
 **Declarative Configurator** is a modular system configuration tool written in Go, designed to bring declarative infrastructure principles to personal system management. Through simple YAML files, users can define desired state for things like installed packages and UI settings (coming soon), and apply them with a single command.
 
-> ⚠️ **Linux-only:** This tool is currently built for Linux systems. <br><br>
-> ⚠️ This project is still in development and in a **VERY** early stage.
+
+> ⚠️ **Linux-only:** This tool is currently built for Linux systems.
 
 ---
 

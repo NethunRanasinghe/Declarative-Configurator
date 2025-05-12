@@ -119,7 +119,7 @@ func StateManager(stateConfig StateConfig) error {
 //region Package Module
 
 func stateManagerPackageModify(stateFilePackagesSection *AppPackages, stateConfig *StateConfig) {
-	// Native - 0, Flatpak - 1, Local - 2
+	// Native - 0, Flatpak - 2
 	// Add - 1, Remove - 0
 
 	// Native
@@ -132,20 +132,11 @@ func stateManagerPackageModify(stateFilePackagesSection *AppPackages, stateConfi
 	}
 
 	// Flatpak
-	if stateConfig.PackageType == 1 {
+	if stateConfig.PackageType == 2 {
 		if stateConfig.AddOrRemove == 1 {
 			stateFilePackagesSection.Flatpaks = append(stateFilePackagesSection.Flatpaks, stateConfig.PackageName)
 		} else {
 			stateFilePackagesSection.Flatpaks = RemoveFromSlice(stateFilePackagesSection.Flatpaks, stateConfig.PackageName)
-		}
-	}
-
-	// Local
-	if stateConfig.PackageType == 2 {
-		if stateConfig.AddOrRemove == 1 {
-			stateFilePackagesSection.Local = append(stateFilePackagesSection.Local, stateConfig.PackageName)
-		} else {
-			stateFilePackagesSection.Local = RemoveFromSlice(stateFilePackagesSection.Local, stateConfig.PackageName)
 		}
 	}
 }

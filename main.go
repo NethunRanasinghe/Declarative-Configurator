@@ -122,18 +122,26 @@ func mergePackages(pkg1, pkg2 []string) []string {
 func separateChanges(changes helper.StateChanges, distro *string) map[packages.PackageManager]helper.PackageOperation {
 	var allChanges = map[packages.PackageManager]helper.PackageOperation{}
 
+	// **PMU** (1)
+
 	// Separate Native Changes
 	var nativeChanges helper.PackageOperation
 	nativeChanges.Install = changes.NativeToInstall
 	nativeChanges.Remove = changes.NativeToRemove
 	allChanges[separatedChangesNative(distro)] = nativeChanges
 
+	// Separate Flatpak Changes
+	var flatpakChanges helper.PackageOperation
+	flatpakChanges.Install = changes.FlatpakToInstall
+	flatpakChanges.Remove = changes.FlatpakToRemove
+	allChanges[separateChangesSandboxed("flatpak")] = flatpakChanges
+
 	// Return all changes
 	return allChanges
 }
 
 func separatedChangesNative(distro *string) packages.PackageManager {
-	var pmTypeMap = map[string]int{"dnf": 0, "apt": 1}
+	var pmTypeMap = map[string]int{"dnf": 0, "apt": 1} // **PMU** (2)
 	var pm packages.PackageManager
 
 	pmType := pmTypeMap[helper.DistroAndPackageManager[*distro]]
@@ -146,6 +154,22 @@ func separatedChangesNative(distro *string) packages.PackageManager {
 	}
 
 	return pm
+}
+
+func separateChangesSandboxed(sandboxType string) packages.PackageManager {
+	var sandboxTypeMap = map[string]int{"flatpak": 0} // **PMU** (2)
+	var spm packages.PackageManager
+
+	spmType := sandboxTypeMap[helper.DistroAndPackageManager[sandboxType]]
+
+	// Perform Package Operations
+	if spmType == 0 {
+		spm = packages.FlatpakManager{}
+	} else {
+		log.Fatal("Sandbox Package Manager is not supported")
+	}
+
+	return spm
 }
 
 func packageOps(pm packages.PackageManager, changes helper.PackageOperation) {
