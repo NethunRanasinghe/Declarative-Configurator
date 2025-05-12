@@ -3,6 +3,7 @@ fedora:
     - btop
     - htop
   Flatpaks:
+    - com.github.vikdevelop.timer
   Local:
   
 any:
