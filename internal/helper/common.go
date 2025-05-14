@@ -35,6 +35,11 @@ var DistroAndPackageManager = map[string]string{
 	"debian":    "apt",
 }
 
+var DistroAndLocalInstaller = map[string]string{
+	"fedora": "dnf",
+	"debian": "apt",
+}
+
 type StateTemplate struct {
 	Packages AppPackages `yaml:"packages"`
 }

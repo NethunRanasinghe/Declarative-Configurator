@@ -128,7 +128,7 @@ func separateChanges(changes helper.StateChanges, distro *string) map[packages.P
 	var nativeChanges helper.PackageOperation
 	nativeChanges.Install = changes.NativeToInstall
 	nativeChanges.Remove = changes.NativeToRemove
-	allChanges[separatedChangesNative(distro)] = nativeChanges
+	allChanges[separatedChangesNativeOrLocal(distro, false)] = nativeChanges
 
 	// Separate Flatpak Changes
 	var flatpakChanges helper.PackageOperation
@@ -136,11 +136,17 @@ func separateChanges(changes helper.StateChanges, distro *string) map[packages.P
 	flatpakChanges.Remove = changes.FlatpakToRemove
 	allChanges[separateChangesSandboxed("flatpak")] = flatpakChanges
 
+	// Separate Local Changes
+	var localChanges helper.PackageOperation
+	localChanges.Install = changes.LocalToInstall
+	localChanges.Remove = changes.LocalToRemove
+	allChanges[separatedChangesNativeOrLocal(distro, true)] = localChanges
+
 	// Return all changes
 	return allChanges
 }
 
-func separatedChangesNative(distro *string) packages.PackageManager {
+func separatedChangesNativeOrLocal(distro *string, localOrNot bool) packages.PackageManager {
 	var pmTypeMap = map[string]int{"dnf": 0, "apt": 1} // **PMU** (2)
 	var pm packages.PackageManager
 
@@ -148,7 +154,11 @@ func separatedChangesNative(distro *string) packages.PackageManager {
 
 	// Perform Package Operations
 	if pmType == 0 {
-		pm = packages.DnfManager{}
+		if !localOrNot {
+			pm = packages.DnfManager{}
+		} else {
+			pm = packages.LocalManager{}
+		}
 	} else {
 		log.Fatal("Package Manager is not supported")
 	}

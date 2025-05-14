@@ -5,6 +5,7 @@ fedora:
   Flatpaks:
     - com.github.vikdevelop.timer
   Local:
+    - './Config/Assets/htop-3.4.1-1.fc42.x86_64.rpm'
   
 any:
   Native:

@@ -119,8 +119,9 @@ func StateManager(stateConfig StateConfig) error {
 //region Package Module
 
 func stateManagerPackageModify(stateFilePackagesSection *AppPackages, stateConfig *StateConfig) {
-	// Native - 0, Flatpak - 2
+	// Native - 0, Flatpak - 2, Local - -1
 	// Add - 1, Remove - 0
+	// **PMU** (3)
 
 	// Native
 	if stateConfig.PackageType == 0 {
@@ -137,6 +138,15 @@ func stateManagerPackageModify(stateFilePackagesSection *AppPackages, stateConfi
 			stateFilePackagesSection.Flatpaks = append(stateFilePackagesSection.Flatpaks, stateConfig.PackageName)
 		} else {
 			stateFilePackagesSection.Flatpaks = RemoveFromSlice(stateFilePackagesSection.Flatpaks, stateConfig.PackageName)
+		}
+	}
+
+	// Local
+	if stateConfig.PackageType == -1 {
+		if stateConfig.AddOrRemove == 1 {
+			stateFilePackagesSection.Local = append(stateFilePackagesSection.Local, stateConfig.PackageName)
+		} else {
+			stateFilePackagesSection.Local = RemoveFromSlice(stateFilePackagesSection.Local, stateConfig.PackageName)
 		}
 	}
 }

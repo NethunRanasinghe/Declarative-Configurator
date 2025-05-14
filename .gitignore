@@ -26,3 +26,7 @@ go.work.sum
 
 # State File
 .state.yaml
+
+# Assets
+.Config/Assets
+.Config/Assets/**
