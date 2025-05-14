@@ -56,7 +56,8 @@ fedora:
 
 * [x] DNF support
 * [ ] APT support
-* [ ] Flatpak and local packages
+* [x] Flatpak support
+* [ ] Local Packages support
 * [ ] UI customization via YAML
 * [ ] Per-module config validation and schema checking
 
