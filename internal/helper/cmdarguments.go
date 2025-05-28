@@ -63,6 +63,7 @@ func HandleCMDArgs(args []string, stringFormat string) int {
 		}
 
 		fmt.Printf(stringFormat, cmdError, cmdErrorSubCmd)
+		return -1
 	}
 
 	fmt.Printf(stringFormat, cmdError, "Invalid Command!")

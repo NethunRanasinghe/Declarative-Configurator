@@ -15,7 +15,10 @@ const stringFormat string = "%-8s : %2s\n"
 func main() {
 
 	// Handle CMD Arguments
-	helper.HandleCMDArgs(os.Args, stringFormat)
+	result := helper.HandleCMDArgs(os.Args, stringFormat)
+	if result == -1 {
+		os.Exit(1)
+	}
 
 	// CMD Flags
 	configPtr := flag.String("config", "", "Config File Location")
@@ -30,11 +33,6 @@ func main() {
 
 	// Start Program
 	showWelcome(stringFormat, osDetails)
-	result := helper.HandleCMDArgs(os.Args, stringFormat)
-
-	if result == -1 {
-		os.Exit(1)
-	}
 
 	if result == 0 || result == 1 {
 		fmt.Printf(stringFormat, cmdInfo, "Refreshing all!")
