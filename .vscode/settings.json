@@ -1,6 +1,0 @@
-{
-    "sonarlint.connectedMode.project": {
-        "connectionId": "https-sonarqube-demonlab-xyz",
-        "projectKey": "NethunRanasinghe_Declarative-Configurator_918e1657-926a-496c-9d72-78c52948f3b6"
-    }
-}
