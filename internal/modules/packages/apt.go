@@ -39,5 +39,15 @@ func (a AptManager) Remove(pkg string) error {
 }
 
 func (a AptManager) Update() error {
-	return a.runAptCommand("update")
+	err := a.runAptCommand("update")
+	if err != nil {
+		return err
+	}
+
+	err1 := a.runAptCommand("upgrade")
+	if err1 != nil {
+		return err1
+	}
+
+	return nil
 }
