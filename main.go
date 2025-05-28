@@ -9,8 +9,10 @@ import (
 	"os"
 )
 
+const cmdInfo string = "\nInfo"
+const stringFormat string = "%-8s : %2s\n"
+
 func main() {
-	const stringFormat string = "%-8s : %2s\n"
 
 	// Handle CMD Arguments
 	helper.HandleCMDArgs(os.Args, stringFormat)
@@ -35,13 +37,18 @@ func main() {
 	}
 
 	if result == 0 || result == 1 {
-		fmt.Printf(stringFormat, "\nInfo", "Refreshing all!")
-		startPackageModule(configPath, osDetails)
+		fmt.Printf(stringFormat, cmdInfo, "Refreshing all!")
+		startPackageModuleInstall(configPath, osDetails)
 	}
 
 	if result == 2 {
-		fmt.Printf(stringFormat, "\nInfo", "Refreshing packages!")
-		startPackageModule(configPath, osDetails)
+		fmt.Printf(stringFormat, cmdInfo, "Refreshing packages!")
+		startPackageModuleInstall(configPath, osDetails)
+	}
+
+	if result == 11 {
+		fmt.Printf(stringFormat, cmdInfo, "Updating packages!")
+		startPackageModuleUpdate(osDetails)
 	}
 
 }
@@ -55,9 +62,24 @@ func showWelcome(stringFormat string, osDetails helper.OsDetailsObject) {
 	fmt.Printf(stringFormat, "Hostname", osDetails.Hostname)
 }
 
-//region Package Module
+// region Package Module
+func startPackageModuleUpdate(osDetails helper.OsDetailsObject) {
 
-func startPackageModule(configDirLoc string, osDetails helper.OsDetailsObject) {
+	// Update Native Packages
+	pmType := getPmType(&osDetails.Distro)
+	fmt.Printf(stringFormat, cmdInfo, "Updating Native packages!")
+	packageUpdate(pmType)
+
+	// Update Flatpaks
+	fmt.Printf(stringFormat, cmdInfo, "Updating Flatpaks!")
+	packageUpdate(packages.FlatpakManager{})
+
+	// Update Local Packages
+	fmt.Printf(stringFormat, cmdInfo, "Updating Local Packages!")
+	packageUpdate(packages.LocalManager{})
+}
+
+func startPackageModuleInstall(configDirLoc string, osDetails helper.OsDetailsObject) {
 
 	fmt.Println("\nPackage Module : Start")
 
@@ -147,20 +169,12 @@ func separateChanges(changes helper.StateChanges, distro *string) map[packages.P
 }
 
 func separatedChangesNativeOrLocal(distro *string, localOrNot bool) packages.PackageManager {
-	var pmTypeMap = map[string]int{"dnf": 0, "apt": 1} // **PMU** (2)
 	var pm packages.PackageManager
-
-	pmType := pmTypeMap[helper.DistroAndPackageManager[*distro]]
 
 	// Perform Package Operations
 	if !localOrNot {
-		if pmType == 0 {
-			pm = packages.DnfManager{}
-		} else if pmType == 1 {
-			pm = packages.AptManager{}
-		} else {
-			log.Fatal("Package Manager is not supported")
-		}
+		pmType := getPmType(distro)
+		pm = pmType
 	} else {
 		pm = packages.LocalManager{}
 	}
@@ -200,6 +214,25 @@ func packageOps(pm packages.PackageManager, changes helper.PackageOperation) {
 			return
 		}
 	}
+}
+
+func packageUpdate(pm packages.PackageManager) {
+	// Update all packages
+	err := pm.Update()
+	if err != nil {
+		return
+	}
+}
+
+func getPmType(distro *string) packages.PackageManager {
+	var pmTypeMap = map[string]int{"dnf": 0, "apt": 1} // **PMU** (2)
+	pmType := pmTypeMap[helper.DistroAndPackageManager[*distro]]
+
+	if pmType == 0 {
+		return packages.DnfManager{}
+	}
+	// temp
+	return packages.AptManager{}
 }
 
 //endregion

@@ -11,6 +11,8 @@ type LocalManager struct{}
 
 var LocalInstaller string
 
+const cmdFormat string = "%-20s : %2s\n"
+
 func (l LocalManager) runLocalCommand(action string, args ...string) error {
 	refreshLocalInstaller()
 	return RunPackageCommand(LocalInstaller, action, true, args...)
@@ -46,14 +48,15 @@ func (l LocalManager) Remove(pkg string) error {
 	return nil
 }
 
-func (l LocalManager) Update() {
-	// In the future--
+func (l LocalManager) Update() error {
+	// In the future
 	// Get the current version
 	// Get the version in yaml
 	// Perform in-place update
 
 	//  Current - Temp
-	fmt.Println("Info : To Update Local Packages, Change the Current Installed Package Version in the YAML !")
+	fmt.Printf(cmdFormat, "Info", "To Update Local Packages, Change the Current Installed Package Version in the YAML and Refresh !")
+	return nil
 }
 
 func refreshLocalInstaller() {
