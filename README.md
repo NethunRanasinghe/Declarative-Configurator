@@ -44,21 +44,23 @@ fedora:
 
 ## 🧠 Available Commands
 
-| Command            | Description                      |
-| ------------------ | -------------------------------- |
-| `refresh`          | Alias for `refresh all`          |
-| `refresh all`      | Refresh all configured modules   |
-| `refresh packages` | Refresh only the packages module |
+| Command            | Description                             |
+|--------------------|-----------------------------------------|
+| `refresh`          | Alias for `refresh all`                 |
+| `refresh all`      | Refresh all configured modules          |
+| `refresh packages` | Refresh only the packages module        |
+| `update packages`  | Update All Packages (Native, Flatpak)   |
 
 ---
 
 ## 🗺 Roadmap
 
 * [x] DNF support
-* [ ] APT support
+* [x] APT support
 * [x] Flatpak support
 * [x] Local Packages support
-* [ ] Package Updates
+* [x] Package Updates (All)
+* [ ] Package Update (Individual)
 * [ ] UI customization via YAML
 * [ ] Per-module config validation and schema checking
 
