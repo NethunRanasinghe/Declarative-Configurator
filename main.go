@@ -81,7 +81,7 @@ func startPackageModuleUpdate(osDetails helper.OsDetailsObject) {
 
 func startPackageModuleInstall(configDirLoc string, osDetails helper.OsDetailsObject) {
 
-	fmt.Println("\nPackage Module : Start")
+	fmt.Printf(stringFormat, "\nPackage Module", "Start")
 
 	// Set Config Path
 	packageConfigPath := fmt.Sprintf("%s/%s", configDirLoc, "package.yaml")
@@ -99,7 +99,7 @@ func startPackageModuleInstall(configDirLoc string, osDetails helper.OsDetailsOb
 	// Check State
 	changes, hasChanged := helper.CheckPackageState(allPackages)
 	if !hasChanged {
-		fmt.Println("\nPackages : No Changes !")
+		fmt.Printf(stringFormat, "\nPackages", "No Changes !")
 		return
 	}
 
@@ -111,7 +111,7 @@ func startPackageModuleInstall(configDirLoc string, osDetails helper.OsDetailsOb
 		packageOps(pm, ch)
 	}
 
-	fmt.Println("\nPackage Module : End")
+	fmt.Printf(stringFormat, "\nPackage Module", "End")
 }
 
 func updateAllPackages(packageDetails []helper.AppPackages, allPackages *helper.AppPackages) {
