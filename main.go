@@ -153,14 +153,16 @@ func separatedChangesNativeOrLocal(distro *string, localOrNot bool) packages.Pac
 	pmType := pmTypeMap[helper.DistroAndPackageManager[*distro]]
 
 	// Perform Package Operations
-	if pmType == 0 {
-		if !localOrNot {
+	if !localOrNot {
+		if pmType == 0 {
 			pm = packages.DnfManager{}
+		} else if pmType == 1 {
+			pm = packages.AptManager{}
 		} else {
-			pm = packages.LocalManager{}
+			log.Fatal("Package Manager is not supported")
 		}
 	} else {
-		log.Fatal("Package Manager is not supported")
+		pm = packages.LocalManager{}
 	}
 
 	return pm
